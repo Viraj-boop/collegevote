@@ -1,0 +1,1033 @@
+/* =========================================
+   FONT
+========================================= */
+
+@import url(
+    'https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap'
+);
+
+
+/* =========================================
+   RESET
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+
+    font-family: "Manrope", sans-serif;
+
+    background: #090909;
+
+    color: #f5f5f5;
+
+    overflow-x: hidden;
+
+}
+
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+.navbar {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+
+    height: 80px;
+
+    padding: 0 5vw;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    z-index: 100;
+
+    color: white;
+
+    mix-blend-mode: difference;
+
+}
+
+
+.brand {
+
+    font-size: 18px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.5px;
+
+}
+
+
+.brand span {
+
+    font-weight: 400;
+
+}
+
+
+.nav-center {
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+    opacity: 0.7;
+
+}
+
+
+.candidate-counter {
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 13px;
+
+}
+
+
+.counter-slash {
+
+    opacity: 0.4;
+
+    margin: 0 5px;
+
+}
+
+
+/* =========================================
+   HERO
+========================================= */
+
+.hero {
+
+    height: 100vh;
+
+    min-height: 700px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    background:
+
+        radial-gradient(
+            circle at center,
+            #252525 0%,
+            #101010 45%,
+            #080808 100%
+        );
+
+}
+
+
+.hero-content {
+
+    max-width: 1000px;
+
+}
+
+
+.hero-eyebrow {
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 10px;
+
+    letter-spacing: 4px;
+
+    opacity: 0.5;
+
+    margin-bottom: 35px;
+
+}
+
+
+.hero h1 {
+
+    font-size: clamp(
+        60px,
+        11vw,
+        160px
+    );
+
+    line-height: 0.86;
+
+    letter-spacing: -0.08em;
+
+    font-weight: 800;
+
+}
+
+
+.hero p {
+
+    margin-top: 40px;
+
+    color: #888;
+
+    font-size: 15px;
+
+    line-height: 1.7;
+
+}
+
+
+.hero-scroll {
+
+    margin-top: 70px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    align-items: center;
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+    color: #777;
+
+}
+
+
+.hero-arrow {
+
+    font-size: 24px;
+
+    animation: arrowBounce 1.7s infinite;
+
+}
+
+
+@keyframes arrowBounce {
+
+    0%,
+    100% {
+
+        transform: translateY(0);
+
+    }
+
+    50% {
+
+        transform: translateY(8px);
+
+    }
+
+}
+
+
+/* =========================================
+   VOTING EXPERIENCE
+========================================= */
+
+.voting-experience {
+
+    height: 100vh;
+
+    min-height: 700px;
+
+    display: grid;
+
+    grid-template-columns: 55% 45%;
+
+    overflow: hidden;
+
+    background: #e9e9e5;
+
+    color: #111;
+
+}
+
+
+/* =========================================
+   WHEEL AREA
+========================================= */
+
+.wheel-area {
+
+    position: relative;
+
+    height: 100%;
+
+    overflow: hidden;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+
+        radial-gradient(
+            circle at center,
+            #eeeeeb 0%,
+            #d9d9d5 100%
+        );
+
+}
+
+
+/* =========================================
+   WHEEL
+========================================= */
+
+.wheel-wrapper {
+
+    position: relative;
+
+    width: 650px;
+
+    height: 650px;
+
+}
+
+
+.candidate-wheel {
+
+    position: absolute;
+
+    width: 100%;
+
+    height: 100%;
+
+    left: 0;
+
+    top: 0;
+
+    transition:
+
+        transform 1s
+        cubic-bezier(
+            .22,
+            1,
+            .36,
+            1
+        );
+
+}
+
+
+/* =========================================
+   WHEEL CENTER
+========================================= */
+
+.wheel-wrapper::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 230px;
+
+    height: 230px;
+
+    left: 50%;
+
+    top: 50%;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+
+    border-radius: 50%;
+
+    border: 1px solid
+        rgba(0, 0, 0, 0.12);
+
+    pointer-events: none;
+
+}
+
+
+/* =========================================
+   WHEEL CANDIDATE
+========================================= */
+
+.wheel-candidate {
+
+    position: absolute;
+
+    width: 150px;
+
+    height: 190px;
+
+    left: 50%;
+
+    top: 50%;
+
+    margin-left: -75px;
+
+    margin-top: -95px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    transition:
+
+        transform .8s
+        cubic-bezier(
+            .22,
+            1,
+            .36,
+            1
+        ),
+
+        opacity .8s ease;
+
+}
+
+
+.wheel-photo {
+
+    width: 95px;
+
+    height: 120px;
+
+    background: #c7c7c3;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 8px;
+
+    letter-spacing: 2px;
+
+    color: #777;
+
+    transition:
+
+        width .8s ease,
+        height .8s ease,
+        box-shadow .8s ease;
+
+}
+
+
+.wheel-candidate.active
+.wheel-photo {
+
+    width: 125px;
+
+    height: 155px;
+
+    box-shadow:
+        0 20px 50px
+        rgba(0,0,0,.2);
+
+}
+
+
+.wheel-name {
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 9px;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+
+    opacity: 0.5;
+
+    white-space: nowrap;
+
+}
+
+
+.wheel-candidate.active
+.wheel-name {
+
+    opacity: 1;
+
+}
+
+
+/* =========================================
+   SCROLL INSTRUCTION
+========================================= */
+
+.wheel-instruction {
+
+    position: absolute;
+
+    bottom: 35px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+    color: #777;
+
+}
+
+
+.mouse-icon {
+
+    width: 13px;
+
+    height: 20px;
+
+    border: 1px solid #777;
+
+    border-radius: 8px;
+
+    position: relative;
+
+}
+
+
+.mouse-icon::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 2px;
+
+    height: 4px;
+
+    background: #777;
+
+    left: 50%;
+
+    top: 4px;
+
+    transform:
+        translateX(-50%);
+
+}
+
+
+/* =========================================
+   CANDIDATE PANEL
+========================================= */
+
+.candidate-panel {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 70px;
+
+    border-left:
+        1px solid
+        rgba(0,0,0,.08);
+
+}
+
+
+.candidate-panel-inner {
+
+    width: 100%;
+
+    max-width: 520px;
+
+}
+
+
+.candidate-index {
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+    color: #777;
+
+    margin-bottom: 25px;
+
+}
+
+
+.candidate-photo-wrapper {
+
+    display: none;
+
+}
+
+
+.candidate-info {
+
+    transition:
+
+        opacity .4s ease,
+        transform .6s
+        cubic-bezier(
+            .22,
+            1,
+            .36,
+            1
+        );
+
+}
+
+
+.candidate-position {
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 10px;
+
+    letter-spacing: 3px;
+
+    color: #777;
+
+    margin-bottom: 20px;
+
+}
+
+
+.candidate-info h2 {
+
+    font-size: clamp(
+        50px,
+        6vw,
+        95px
+    );
+
+    line-height: .9;
+
+    letter-spacing: -.07em;
+
+    margin-bottom: 20px;
+
+}
+
+
+.candidate-department {
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    margin-bottom: 25px;
+
+}
+
+
+.candidate-description {
+
+    max-width: 400px;
+
+    color: #666;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+
+    margin-bottom: 40px;
+
+}
+
+
+/* =========================================
+   VOTE BUTTON
+========================================= */
+
+.vote-button {
+
+    width: 100%;
+
+    max-width: 340px;
+
+    padding: 18px 22px;
+
+    border: none;
+
+    background: #111;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    cursor: pointer;
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+    transition:
+
+        transform .3s ease,
+        background .3s ease;
+
+}
+
+
+.vote-button:hover {
+
+    transform:
+        translateX(8px);
+
+    background: #292929;
+
+}
+
+
+.vote-arrow {
+
+    font-size: 20px;
+
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+.modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(0,0,0,.7);
+
+    backdrop-filter:
+        blur(12px);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition:
+
+        opacity .3s ease,
+        visibility .3s ease;
+
+}
+
+
+.modal.open {
+
+    opacity: 1;
+
+    visibility: visible;
+
+}
+
+
+.modal-box {
+
+    width: min(
+        500px,
+        100%
+    );
+
+    padding: 50px;
+
+    background: #f1f1ed;
+
+    color: #111;
+
+    transform:
+        translateY(30px);
+
+    transition:
+        transform .4s ease;
+
+    position: relative;
+
+}
+
+
+.modal.open
+.modal-box {
+
+    transform:
+        translateY(0);
+
+}
+
+
+.modal-close {
+
+    position: absolute;
+
+    top: 15px;
+
+    right: 20px;
+
+    background: none;
+
+    border: none;
+
+    font-size: 28px;
+
+    cursor: pointer;
+
+}
+
+
+.modal-eyebrow {
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+    color: #777;
+
+    margin-bottom: 20px;
+
+}
+
+
+.modal-box h3 {
+
+    font-size: 45px;
+
+    letter-spacing: -.06em;
+
+    margin-bottom: 35px;
+
+}
+
+
+.modal-candidate {
+
+    border-top: 1px solid #ccc;
+
+    border-bottom: 1px solid #ccc;
+
+    padding: 25px 0;
+
+}
+
+
+.modal-position {
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+    color: #777;
+
+    margin-bottom: 8px;
+
+}
+
+
+.modal-name {
+
+    font-size: 25px;
+
+    font-weight: 700;
+
+}
+
+
+.modal-warning {
+
+    color: #777;
+
+    font-size: 12px;
+
+    line-height: 1.6;
+
+    margin: 25px 0;
+
+}
+
+
+.modal-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+}
+
+
+.modal-actions button {
+
+    padding: 15px 20px;
+
+    border: none;
+
+    cursor: pointer;
+
+    font-family: "DM Mono", monospace;
+
+    font-size: 9px;
+
+    letter-spacing: 1px;
+
+}
+
+
+.modal-cancel {
+
+    background: #ddd;
+
+    color: #111;
+
+}
+
+
+.modal-confirm {
+
+    flex: 1;
+
+    background: #111;
+
+    color: white;
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .nav-center {
+
+        display: none;
+
+    }
+
+
+    .voting-experience {
+
+        height: auto;
+
+        min-height: 100vh;
+
+        grid-template-columns: 1fr;
+
+        overflow: visible;
+
+    }
+
+
+    .wheel-area {
+
+        height: 60vh;
+
+        min-height: 500px;
+
+    }
+
+
+    .wheel-wrapper {
+
+        width: 450px;
+
+        height: 450px;
+
+        transform:
+            scale(.85);
+
+    }
+
+
+    .candidate-panel {
+
+        min-height: 70vh;
+
+        padding: 50px 25px;
+
+    }
+
+
+    .candidate-info h2 {
+
+        font-size: 55px;
+
+    }
+
+
+    .modal-box {
+
+        padding: 35px 25px;
+
+    }
+
+}

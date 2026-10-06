@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CollegeVote — Student Login</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #252525,
+                    #090909 60%
+                );
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            color: white;
+
+        }
+
+
+        .login-container {
+
+            width: min(
+                420px,
+                calc(100% - 40px)
+            );
+
+            padding: 42px;
+
+            background:
+                rgba(255,255,255,0.06);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.12);
+
+            border-radius: 24px;
+
+            backdrop-filter:
+                blur(20px);
+
+            box-shadow:
+                0 30px 80px
+                rgba(0,0,0,0.5);
+
+        }
+
+
+        .brand {
+
+            text-align: center;
+
+            margin-bottom: 35px;
+
+        }
+
+
+        .brand h1 {
+
+            font-size: 34px;
+
+            letter-spacing: -1px;
+
+        }
+
+
+        .brand p {
+
+            margin-top: 8px;
+
+            color: #999;
+
+            font-size: 14px;
+
+        }
+
+
+        .field {
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .field label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-size: 13px;
+
+            color: #aaa;
+
+        }
+
+
+        .field input {
+
+            width: 100%;
+
+            padding: 15px 16px;
+
+            border-radius: 12px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.12);
+
+            background:
+                rgba(255,255,255,0.06);
+
+            color: white;
+
+            outline: none;
+
+            font-size: 15px;
+
+        }
+
+
+        .field input:focus {
+
+            border-color:
+                rgba(255,255,255,0.45);
+
+        }
+
+
+        .login-button {
+
+            width: 100%;
+
+            padding: 16px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background: white;
+
+            color: black;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.2s ease,
+                opacity 0.2s ease;
+
+        }
+
+
+        .login-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            opacity: 0.9;
+
+        }
+
+
+        .error {
+
+            margin-bottom: 20px;
+
+            padding: 12px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,60,60,0.12);
+
+            border:
+                1px solid
+                rgba(255,60,60,0.25);
+
+            color: #ff8b8b;
+
+            font-size: 13px;
+
+        }
+
+
+        .footer {
+
+            margin-top: 25px;
+
+            text-align: center;
+
+            color: #666;
+
+            font-size: 12px;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="login-container">
+
+        <div class="brand">
+
+            <h1>CollegeVote</h1>
+
+            <p>
+                2026 Student Elections
+            </p>
+
+        </div>
+
+
+        {% if error %}
+
+        <div class="error">
+
+            {{ error }}
+
+        </div>
+
+        {% endif %}
+
+
+        <form
+            action="/login"
+            method="POST"
+        >
+
+            <div class="field">
+
+                <label>
+                    Student ID
+                </label>
+
+                <input
+                    type="text"
+                    name="student_id"
+                    placeholder="Enter your student ID"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="login-button"
+            >
+
+                Continue to Vote
+
+            </button>
+
+        </form>
+
+
+        <div class="footer">
+
+            Your vote matters.
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
