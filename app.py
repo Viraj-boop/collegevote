@@ -7,15 +7,31 @@ from flask import (
     redirect
 )
 
+import os
+from dotenv import load_dotenv
 import mysql.connector
 from mysql.connector import Error
 
 
+# =========================================
+# LOAD ENVIRONMENT VARIABLES
+# =========================================
+
+load_dotenv()
+
+
+# =========================================
+# FLASK APP
+# =========================================
+
 app = Flask(__name__)
 
+
 # Used to securely maintain the student's login session.
-# Change this to a longer random value later.
-app.secret_key = "collegevote-secret-key-2026"
+app.secret_key = os.getenv(
+    "SECRET_KEY",
+    "collegevote-secret-key-2026"
+)
 
 
 # =========================================
@@ -27,14 +43,29 @@ def get_db_connection():
     try:
 
         connection = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="",
-            database="college_voting",
-            port=3306
+
+            host=os.getenv("DB_HOST"),
+
+            user=os.getenv("DB_USER"),
+
+            password=os.getenv("DB_PASSWORD"),
+
+            database=os.getenv("DB_NAME"),
+
+            port=int(os.getenv("DB_PORT", 3306)),
+
+            # Aiven requires encrypted database connections.
+            ssl_disabled=False,
+
+            # For this college project, encryption is enabled
+            # without requiring a locally stored CA certificate.
+            ssl_verify_cert=False,
+
+            ssl_verify_identity=False
         )
 
         return connection
+
 
     except Error as e:
 
@@ -257,8 +288,7 @@ def get_candidates():
 
         return jsonify({
             "success": False,
-            "message":
-                "Database connection failed"
+            "message": "Database connection failed"
         }), 500
 
 
@@ -316,6 +346,7 @@ def get_candidates():
 
         }), 500
 
+
 # =========================================
 # CAST VOTE
 # =========================================
@@ -330,8 +361,11 @@ def cast_vote():
     if "student_id" not in session:
 
         return jsonify({
+
             "success": False,
+
             "message": "Please login first."
+
         }), 401
 
 
@@ -341,11 +375,15 @@ def cast_vote():
 
     data = request.get_json()
 
+
     if not data or "candidate_id" not in data:
 
         return jsonify({
+
             "success": False,
+
             "message": "Candidate ID is required."
+
         }), 400
 
 
@@ -355,11 +393,15 @@ def cast_vote():
             data["candidate_id"]
         )
 
+
     except (ValueError, TypeError):
 
         return jsonify({
+
             "success": False,
+
             "message": "Invalid candidate ID."
+
         }), 400
 
 
@@ -376,8 +418,11 @@ def cast_vote():
     if connection is None:
 
         return jsonify({
+
             "success": False,
+
             "message": "Database connection failed."
+
         }), 500
 
 
@@ -418,8 +463,11 @@ def cast_vote():
             connection.rollback()
 
             return jsonify({
+
                 "success": False,
+
                 "message": "Student account not found."
+
             }), 404
 
 
@@ -432,8 +480,11 @@ def cast_vote():
             connection.rollback()
 
             return jsonify({
+
                 "success": False,
+
                 "message": "You have already voted."
+
             }), 409
 
 
@@ -463,8 +514,11 @@ def cast_vote():
             connection.rollback()
 
             return jsonify({
+
                 "success": False,
+
                 "message": "Candidate not found."
+
             }), 404
 
 
@@ -534,9 +588,13 @@ def cast_vote():
             "message": "Vote submitted successfully.",
 
             "candidate": {
+
                 "id": candidate["id"],
+
                 "name": candidate["name"],
+
                 "position": candidate["position"]
+
             }
 
         })
@@ -546,6 +604,7 @@ def cast_vote():
 
         connection.rollback()
 
+
         print(
             "Vote database error:",
             e
@@ -553,6 +612,7 @@ def cast_vote():
 
 
         # Duplicate student vote protection
+
         if getattr(e, "errno", None) == 1062:
 
             return jsonify({
@@ -579,6 +639,7 @@ def cast_vote():
 
         connection.rollback()
 
+
         print(
             "Vote error:",
             e
@@ -602,6 +663,8 @@ def cast_vote():
             cursor.close()
 
         connection.close()
+
+
 # =========================================
 # DATABASE TEST
 # =========================================

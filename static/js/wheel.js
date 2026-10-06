@@ -1,23 +1,19 @@
-document.addEventListener("DOMContentLoaded", async () => {
+/* =========================================
+   COLLEGEVOTE — CANDIDATE WHEEL SYSTEM
+   FULL ENHANCED VERSION
+========================================= */
 
-    /* =====================================
-       ELEMENTS
-    ===================================== */
+document.addEventListener("DOMContentLoaded", () => {
 
-    const wheel =
+    /* =========================================
+       DOM ELEMENTS
+    ========================================== */
+
+    const candidateWheel =
         document.getElementById("candidateWheel");
 
-    const currentNumber =
-        document.getElementById("currentNumber");
-
-    const totalNumber =
-        document.getElementById("totalNumber");
-
-    const panelNumber =
-        document.getElementById("panelNumber");
-
-    const panelTotal =
-        document.getElementById("panelTotal");
+    const candidatePhoto =
+        document.getElementById("candidatePhoto");
 
     const candidateName =
         document.getElementById("candidateName");
@@ -31,10 +27,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     const candidateDescription =
         document.getElementById("candidateDescription");
 
+    const currentNumber =
+        document.getElementById("currentNumber");
+
+    const totalNumber =
+        document.getElementById("totalNumber");
+
+    const panelNumber =
+        document.getElementById("panelNumber");
+
+    const panelTotal =
+        document.getElementById("panelTotal");
+
     const voteButton =
         document.getElementById("voteButton");
 
-    const modal =
+    const voteModal =
         document.getElementById("voteModal");
 
     const modalClose =
@@ -50,34 +58,107 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("modalCandidateName");
 
     const modalCandidatePosition =
-        document.getElementById(
-            "modalCandidatePosition"
+        document.getElementById("modalCandidatePosition");
+
+    const votingExperience =
+        document.querySelector(".voting-experience");
+
+    const wheelArea =
+        document.querySelector(".wheel-area");
+
+
+    /* =========================================
+       SAFETY CHECK
+    ========================================== */
+
+    if (!candidateWheel) {
+        console.error(
+            "CollegeVote: #candidateWheel was not found."
         );
 
+        return;
+    }
 
-    /* =====================================
+
+    /* =========================================
        STATE
-    ===================================== */
+    ========================================== */
 
     let candidates = [];
 
     let activeIndex = 0;
 
-    let rotation = 0;
-
     let isAnimating = false;
 
-    let scrollLock = false;
+    let wheelLocked = false;
 
-    let selectedCandidate = null;
+    let touchStartY = 0;
+
+    let lastWheelTime = 0;
 
 
-    const radius = 245;
+    /* =========================================
+       CONFIGURATION
+    ========================================== */
+
+    const wheelRadius = 250;
+
+    const wheelAnimationDuration = 650;
+
+    const wheelSensitivity = 35;
 
 
-    /* =====================================
-       LOAD CANDIDATES FROM FLASK / MYSQL
-    ===================================== */
+    /* =========================================
+       CANDIDATE IMAGES
+    ========================================== */
+
+    const candidateImages = {
+
+        "Arjun Sharma":
+            "/static/images/arjun.jpg",
+
+        "Priya Patil":
+            "/static/images/priya.jpg",
+
+        "Rohan Joshi":
+            "/static/images/rohan.jpg",
+
+        "Sneha Kulkarni":
+            "/static/images/sneha.jpg",
+
+        "Aditya Deshmukh":
+            "/static/images/aditya.jpg"
+
+    };
+
+
+    /* =========================================
+       CANDIDATE DESCRIPTIONS
+    ========================================== */
+
+    const descriptions = {
+
+        "Arjun Sharma":
+            "Building a stronger, smarter and more connected campus for every student.",
+
+        "Priya Patil":
+            "Creating a more inclusive campus where every student's voice is heard.",
+
+        "Rohan Joshi":
+            "Focused on transparency, student representation and meaningful change.",
+
+        "Sneha Kulkarni":
+            "Bringing creativity, culture and unforgettable experiences to campus life.",
+
+        "Aditya Deshmukh":
+            "Promoting a healthier, more active and competitive student community."
+
+    };
+
+
+    /* =========================================
+       LOAD CANDIDATES
+    ========================================== */
 
     async function loadCandidates() {
 
@@ -97,31 +178,43 @@ document.addEventListener("DOMContentLoaded", async () => {
             const data =
                 await response.json();
 
-            if (
-                !data.success ||
-                !Array.isArray(data.candidates)
-            ) {
+            if (!data.success) {
 
                 throw new Error(
-                    "Invalid candidate data."
+                    data.message ||
+                    "Unable to load candidates."
                 );
 
             }
 
             candidates =
-                data.candidates;
+                data.candidates || [];
 
+            if (!candidates.length) {
 
-            if (candidates.length === 0) {
-
-                throw new Error(
-                    "No candidates found in database."
+                console.warn(
+                    "No candidates found."
                 );
+
+                return;
 
             }
 
+            const total =
+                String(candidates.length)
+                    .padStart(2, "0");
 
-            initializeWheel();
+            if (totalNumber) {
+                totalNumber.textContent = total;
+            }
+
+            if (panelTotal) {
+                panelTotal.textContent = total;
+            }
+
+            buildWheel();
+
+            updateCandidate(0, true);
 
         } catch (error) {
 
@@ -130,155 +223,171 @@ document.addEventListener("DOMContentLoaded", async () => {
                 error
             );
 
-            wheel.innerHTML = `
-                <div style="
-                    position:absolute;
-                    inset:0;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    text-align:center;
-                    font-family:monospace;
-                    color:#777;
-                    padding:30px;
-                ">
-                    Unable to load candidates.
-                </div>
-            `;
-
         }
 
     }
 
 
-    /* =====================================
-       INITIALIZE WHEEL
-    ===================================== */
+    /* =========================================
+       BUILD WHEEL
+    ========================================== */
 
-    function initializeWheel() {
+    function buildWheel() {
 
-        const candidateCount =
-            candidates.length;
-
-        const angleStep =
-            360 / candidateCount;
-
-
-        totalNumber.textContent =
-            String(candidateCount)
-                .padStart(2, "0");
-
-        panelTotal.textContent =
-            String(candidateCount)
-                .padStart(2, "0");
-
-
-        wheel.innerHTML = "";
-
-
-        /* =====================================
-           CREATE CANDIDATE ITEMS
-        ===================================== */
+        candidateWheel.innerHTML = "";
 
         candidates.forEach(
             (candidate, index) => {
 
-                const item =
+                const card =
                     document.createElement("div");
 
-                item.className =
+                card.className =
                     "wheel-candidate";
 
-                item.dataset.index =
+                card.dataset.index =
                     index;
 
+                card.innerHTML = `
 
-                const photo =
-                    document.createElement("div");
+                    <div class="wheel-candidate-number">
+                        ${String(index + 1).padStart(2, "0")}
+                    </div>
 
-                photo.className =
-                    "wheel-photo";
+                    <div class="wheel-candidate-name">
+                        ${escapeHTML(candidate.name)}
+                    </div>
 
-                photo.textContent =
-                    "PHOTO";
+                    <div class="wheel-candidate-position">
+                        ${escapeHTML(candidate.position || "")}
+                    </div>
 
+                `;
 
-                const name =
-                    document.createElement("div");
+                card.addEventListener(
+                    "click",
+                    () => {
 
-                name.className =
-                    "wheel-name";
+                        if (
+                            isAnimating ||
+                            index === activeIndex
+                        ) {
+                            return;
+                        }
 
-                name.textContent =
-                    candidate.name;
+                        goToCandidate(index);
 
+                    }
+                );
 
-                item.appendChild(photo);
-
-                item.appendChild(name);
-
-                wheel.appendChild(item);
+                candidateWheel.appendChild(card);
 
             }
         );
 
-
-        positionCandidates(
-            angleStep
-        );
-
-
-        updateActiveCandidate();
-
-
-        /*
-         * Make sure the first candidate
-         * is visually active.
-         */
-
-        const firstCandidate =
-            wheel.querySelector(
-                ".wheel-candidate"
-            );
-
-        if (firstCandidate) {
-
-            firstCandidate.classList.add(
-                "active"
-            );
-
-        }
+        positionWheel();
 
     }
 
 
-    /* =====================================
-       POSITION CANDIDATES
-    ===================================== */
+    /* =========================================
+       POSITION WHEEL
+    ========================================== */
 
-    function positionCandidates(
-        angleStep
-    ) {
+    function positionWheel() {
 
-        const wheelCandidates =
-            document.querySelectorAll(
+        const cards =
+            candidateWheel.querySelectorAll(
                 ".wheel-candidate"
             );
 
+        const total =
+            cards.length;
 
-        wheelCandidates.forEach(
-            (item, index) => {
+        if (!total) {
+            return;
+        }
+
+        cards.forEach(
+            (card, index) => {
+
+                /*
+                    Calculate position relative
+                    to currently selected candidate.
+                */
+
+                let relative =
+                    index - activeIndex;
+
+                /*
+                    Wrap candidates around the circle.
+                */
+
+                if (relative > total / 2) {
+                    relative -= total;
+                }
+
+                if (relative < -total / 2) {
+                    relative += total;
+                }
 
                 const angle =
-                    index * angleStep;
+                    relative * (360 / total);
 
+                const radians =
+                    angle * Math.PI / 180;
 
-                item.style.transform =
-                    `
-                    rotate(${angle}deg)
-                    translateY(-${radius}px)
-                    rotate(${-angle}deg)
-                    `;
+                const x =
+                    Math.sin(radians) *
+                    wheelRadius;
+
+                const y =
+                    -Math.cos(radians) *
+                    wheelRadius;
+
+                /*
+                    Selected candidate becomes
+                    visually dominant.
+                */
+
+                const isActive =
+                    relative === 0;
+
+                const scale =
+                    isActive
+                        ? 1
+                        : 0.72;
+
+                const opacity =
+                    isActive
+                        ? 1
+                        : 0.42;
+
+                const zIndex =
+                    isActive
+                        ? 30
+                        : 5;
+
+                card.style.transform = `
+                    translate(-50%, -50%)
+                    translate3d(
+                        ${x}px,
+                        ${y}px,
+                        0
+                    )
+                    scale(${scale})
+                `;
+
+                card.style.opacity =
+                    opacity;
+
+                card.style.zIndex =
+                    zIndex;
+
+                card.classList.toggle(
+                    "active",
+                    isActive
+                );
 
             }
         );
@@ -286,70 +395,308 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
-    /* =====================================
-       ROTATE WHEEL
-    ===================================== */
+    /* =========================================
+       UPDATE ACTIVE CANDIDATE
+    ========================================== */
 
-    function rotateWheel(direction) {
+    function updateCandidate(
+        index,
+        instant = false
+    ) {
 
-        if (isAnimating) {
-
+        if (!candidates.length) {
             return;
-
         }
-
-
-        const nextIndex =
-            activeIndex + direction;
-
-
-        /*
-         * Don't rotate beyond the
-         * first candidate.
-         */
-
-        if (nextIndex < 0) {
-
-            return;
-
-        }
-
-
-        /*
-         * Don't rotate beyond the
-         * last candidate.
-         */
 
         if (
-            nextIndex >= candidates.length
+            index < 0 ||
+            index >= candidates.length
         ) {
-
             return;
+        }
+
+        activeIndex =
+            index;
+
+        const candidate =
+            candidates[activeIndex];
+
+        const number =
+            String(activeIndex + 1)
+                .padStart(2, "0");
+
+        /*
+            HEADER COUNTER
+        */
+
+        if (currentNumber) {
+            currentNumber.textContent =
+                number;
+        }
+
+        /*
+            PANEL COUNTER
+        */
+
+        if (panelNumber) {
+            panelNumber.textContent =
+                number;
+        }
+
+        /*
+            CANDIDATE POSITION
+        */
+
+        if (candidatePosition) {
+
+            candidatePosition.textContent =
+                candidate.position ||
+                "CANDIDATE";
 
         }
 
+        /*
+            CANDIDATE NAME
+        */
 
-        isAnimating = true;
+        if (candidateName) {
+
+            candidateName.textContent =
+                candidate.name ||
+                "Unknown Candidate";
+
+        }
+
+        /*
+            DEPARTMENT
+        */
+
+        if (candidateDepartment) {
+
+            candidateDepartment.textContent =
+                candidate.department ||
+                "";
+
+        }
+
+        /*
+            DESCRIPTION
+        */
+
+        if (candidateDescription) {
+
+            candidateDescription.textContent =
+                descriptions[candidate.name] ||
+                "Working to make campus life better for every student.";
+
+        }
+
+        /*
+            CENTER PHOTO
+        */
+
+        updatePhoto(
+            candidate,
+            instant
+        );
+
+        /*
+            MOVE WHEEL
+        */
+
+        positionWheel();
+
+        /*
+            MODAL
+        */
+
+        updateModal(
+            candidate
+        );
+
+        /*
+            BUTTON
+        */
+
+        updateVoteButton();
+
+    }
 
 
-        activeIndex =
-            nextIndex;
+    /* =========================================
+       UPDATE CENTER PHOTO
+    ========================================== */
+
+    function updatePhoto(
+        candidate,
+        instant = false
+    ) {
+
+        if (!candidatePhoto) {
+            return;
+        }
+
+        const imagePath =
+            candidateImages[candidate.name];
+
+        /*
+            Remove old photo smoothly.
+        */
+
+        if (!instant) {
+
+            candidatePhoto.classList.add(
+                "photo-changing"
+            );
+
+        }
+
+        const loadImage = () => {
+
+            candidatePhoto.innerHTML = "";
+
+            if (!imagePath) {
+
+                candidatePhoto.innerHTML =
+                    "<span>PHOTO</span>";
+
+                candidatePhoto.classList.remove(
+                    "photo-changing"
+                );
+
+                return;
+
+            }
+
+            const image =
+                document.createElement("img");
+
+            image.src =
+                imagePath;
+
+            image.alt =
+                candidate.name;
+
+            image.draggable =
+                false;
+
+            image.onload = () => {
+
+                candidatePhoto.innerHTML = "";
+
+                candidatePhoto.appendChild(
+                    image
+                );
+
+                /*
+                    Make sure the selected
+                    candidate is always visible
+                    in the center.
+                */
+
+                candidatePhoto.classList.remove(
+                    "photo-changing"
+                );
+
+            };
+
+            image.onerror = () => {
+
+                console.error(
+                    "Could not load image:",
+                    imagePath
+                );
+
+                candidatePhoto.innerHTML =
+                    "<span>PHOTO</span>";
+
+                candidatePhoto.classList.remove(
+                    "photo-changing"
+                );
+
+            };
+
+            /*
+                Append immediately so the browser
+                starts loading the image.
+            */
+
+            candidatePhoto.appendChild(
+                image
+            );
+
+        };
 
 
-        const angleStep =
-            360 / candidates.length;
+        if (instant) {
+
+            loadImage();
+
+        } else {
+
+            setTimeout(
+                loadImage,
+                160
+            );
+
+        }
+
+    }
 
 
-        rotation =
-            -(activeIndex * angleStep);
+    /* =========================================
+       MOVE TO CANDIDATE
+    ========================================== */
 
+    function goToCandidate(index) {
 
-        wheel.style.transform =
-            `rotate(${rotation}deg)`;
+        if (
+            isAnimating ||
+            index === activeIndex ||
+            index < 0 ||
+            index >= candidates.length
+        ) {
+            return;
+        }
 
+        isAnimating =
+            true;
 
-        updateActiveCandidate();
+        /*
+            Add transition class if your
+            CSS contains it.
+        */
 
+        if (candidatePhoto) {
+
+            candidatePhoto.classList.add(
+                "photo-changing"
+            );
+
+        }
+
+        /*
+            Small delay makes the transition
+            feel intentional.
+        */
+
+        setTimeout(
+            () => {
+
+                updateCandidate(
+                    index
+                );
+
+                /*
+                    Keep wheel centered on
+                    selected candidate.
+                */
+
+                positionWheel();
+
+            },
+            180
+        );
 
         setTimeout(
             () => {
@@ -358,216 +705,141 @@ document.addEventListener("DOMContentLoaded", async () => {
                     false;
 
             },
-            850
+            wheelAnimationDuration
         );
 
     }
 
 
-    /* =====================================
-       UPDATE ACTIVE CANDIDATE
-    ===================================== */
+    /* =========================================
+       NEXT / PREVIOUS
+    ========================================== */
 
-    function updateActiveCandidate() {
+    function changeCandidate(
+        direction
+    ) {
 
-        const wheelCandidates =
-            document.querySelectorAll(
-                ".wheel-candidate"
-            );
-
-
-        wheelCandidates.forEach(
-            (item, index) => {
-
-                item.classList.toggle(
-                    "active",
-                    index === activeIndex
-                );
-
-            }
-        );
-
-
-        const candidate =
-            candidates[activeIndex];
-
-
-        if (!candidate) {
-
+        if (
+            isAnimating ||
+            !candidates.length
+        ) {
             return;
+        }
+
+        let nextIndex =
+            activeIndex + direction;
+
+        /*
+            LOOP THE WHEEL.
+
+            Last -> First
+            First -> Last
+        */
+
+        if (
+            nextIndex >=
+            candidates.length
+        ) {
+
+            nextIndex = 0;
 
         }
 
+        if (
+            nextIndex < 0
+        ) {
 
-        const number =
-            String(
-                activeIndex + 1
-            ).padStart(2, "0");
+            nextIndex =
+                candidates.length - 1;
 
+        }
 
-        currentNumber.textContent =
-            number;
-
-
-        panelNumber.textContent =
-            number;
-
-
-        candidateName.textContent =
-            candidate.name;
-
-
-        candidatePosition.textContent =
-            candidate.position;
-
-
-        candidateDepartment.textContent =
-            candidate.department;
-
-
-        /*
-         * Your current database doesn't have
-         * a description column, so we create
-         * a simple description automatically.
-         */
-
-        candidateDescription.textContent =
-            `Representing ${
-                candidate.department
-            } and working toward a better
-            campus experience for students.`;
-
-
-        voteButton.dataset.candidateId =
-            candidate.id;
-
-
-        /*
-         * Small animation for the
-         * vote button.
-         */
-
-        voteButton.style.transform =
-            "translateX(20px)";
-
-
-        setTimeout(
-            () => {
-
-                voteButton.style.transform =
-                    "translateX(0)";
-
-            },
-            50
+        goToCandidate(
+            nextIndex
         );
 
     }
 
 
-    /* =====================================
-       WHEEL SCROLL CONTROL
-    ===================================== */
+    /* =========================================
+       MOUSE WHEEL
+    ========================================== */
 
     window.addEventListener(
         "wheel",
         (event) => {
 
-            const votingSection =
-                document.querySelector(
-                    ".voting-experience"
-                );
-
-
-            const rect =
-                votingSection.getBoundingClientRect();
-
-
-            const insideVotingSection =
-                rect.top <= 100 &&
-                rect.bottom >=
-                    window.innerHeight - 100;
-
-
-            /*
-             * Outside voting section:
-             * allow normal page scrolling.
-             */
-
-            if (!insideVotingSection) {
-
+            if (!candidates.length) {
                 return;
-
             }
 
-
             /*
-             * Candidate 1 + scroll UP
-             * = leave voting section.
-             */
-
-            const tryingToLeaveTop =
-                activeIndex === 0 &&
-                event.deltaY < 0;
-
-
-            /*
-             * Last candidate + scroll DOWN
-             * = leave voting section.
-             */
-
-            const tryingToLeaveBottom =
-                activeIndex ===
-                    candidates.length - 1 &&
-                event.deltaY > 0;
-
+                Only react when the user's mouse
+                is actually over the voting wheel.
+            */
 
             if (
-                tryingToLeaveTop ||
-                tryingToLeaveBottom
+                wheelArea &&
+                !wheelArea.contains(event.target)
             ) {
-
                 return;
-
             }
 
+            /*
+                Ignore tiny trackpad movement.
+            */
+
+            if (
+                Math.abs(event.deltaY) <
+                wheelSensitivity
+            ) {
+                return;
+            }
 
             /*
-             * Wheel still has candidates
-             * to reveal.
-             */
+                Prevent the entire page from
+                scrolling while using the wheel.
+            */
 
             event.preventDefault();
 
+            const now =
+                Date.now();
 
-            if (scrollLock) {
+            /*
+                Prevent ultra-fast trackpad
+                scrolling from skipping candidates.
+            */
 
+            if (
+                now - lastWheelTime <
+                wheelAnimationDuration
+            ) {
                 return;
-
             }
 
-
-            scrollLock = true;
-
+            lastWheelTime =
+                now;
 
             if (event.deltaY > 0) {
 
-                rotateWheel(1);
+                /*
+                    Scroll DOWN
+                    = NEXT CANDIDATE
+                */
+
+                changeCandidate(1);
 
             } else {
 
-                rotateWheel(-1);
+                /*
+                    Scroll UP
+                    = PREVIOUS CANDIDATE
+                */
+
+                changeCandidate(-1);
 
             }
-
-
-            setTimeout(
-                () => {
-
-                    scrollLock = false;
-
-                },
-                900
-            );
 
         },
         {
@@ -576,28 +848,117 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
 
-    /* =====================================
-       KEYBOARD SUPPORT
-    ===================================== */
+    /* =========================================
+       TOUCH / MOBILE SWIPE
+    ========================================== */
+
+    if (wheelArea) {
+
+        wheelArea.addEventListener(
+            "touchstart",
+            (event) => {
+
+                if (
+                    !event.touches.length
+                ) {
+                    return;
+                }
+
+                touchStartY =
+                    event.touches[0].clientY;
+
+            },
+            {
+                passive: true
+            }
+        );
+
+
+        wheelArea.addEventListener(
+            "touchend",
+            (event) => {
+
+                if (
+                    !event.changedTouches.length
+                ) {
+                    return;
+                }
+
+                const touchEndY =
+                    event.changedTouches[0].clientY;
+
+                const difference =
+                    touchStartY -
+                    touchEndY;
+
+                if (
+                    Math.abs(difference) <
+                    45
+                ) {
+                    return;
+                }
+
+                if (difference > 0) {
+
+                    changeCandidate(1);
+
+                } else {
+
+                    changeCandidate(-1);
+
+                }
+
+            },
+            {
+                passive: true
+            }
+        );
+
+    }
+
+
+    /* =========================================
+       KEYBOARD CONTROLS
+    ========================================== */
 
     window.addEventListener(
         "keydown",
         (event) => {
 
+            /*
+                Don't interfere with typing.
+            */
+
+            const tag =
+                document.activeElement?.tagName;
+
             if (
-                event.key === "ArrowDown"
+                tag === "INPUT" ||
+                tag === "TEXTAREA" ||
+                tag === "BUTTON"
+            ) {
+                return;
+            }
+
+            if (
+                event.key ===
+                "ArrowDown"
             ) {
 
-                rotateWheel(1);
+                event.preventDefault();
+
+                changeCandidate(1);
 
             }
 
-
             if (
-                event.key === "ArrowUp"
+                event.key ===
+                "ArrowUp"
             ) {
 
-                rotateWheel(-1);
+                event.preventDefault();
+
+                changeCandidate(-1);
 
             }
 
@@ -605,263 +966,305 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
 
-    /* =====================================
-       OPEN VOTE MODAL
-    ===================================== */
+    /* =========================================
+       MODAL
+    ========================================== */
 
-    voteButton.addEventListener(
-        "click",
-        () => {
+    function updateModal(
+        candidate
+    ) {
 
-            selectedCandidate =
-                candidates[activeIndex];
-
-
-            if (!selectedCandidate) {
-
-                return;
-
-            }
-
+        if (modalCandidateName) {
 
             modalCandidateName.textContent =
-                selectedCandidate.name;
-
-
-            modalCandidatePosition.textContent =
-                selectedCandidate.position;
-
-
-            modal.classList.add(
-                "open"
-            );
-
-
-            document.body.style.overflow =
-                "hidden";
+                candidate.name;
 
         }
-    );
 
+        if (modalCandidatePosition) {
 
-    /* =====================================
-       CLOSE MODAL
-    ===================================== */
+            modalCandidatePosition.textContent =
+                candidate.position;
+
+        }
+
+    }
+
 
     function closeModal() {
 
-        modal.classList.remove(
-            "open"
-        );
-
-
-        document.body.style.overflow =
-            "";
-
-    }
-
-
-    modalClose.addEventListener(
-        "click",
-        closeModal
-    );
-
-
-    modalCancel.addEventListener(
-        "click",
-        closeModal
-    );
-
-
-    modal.addEventListener(
-        "click",
-        (event) => {
-
-            if (
-                event.target === modal
-            ) {
-
-                closeModal();
-
-            }
-
-        }
-    );
-
-
-   /* =====================================
-   SUBMIT VOTE TO FLASK + MYSQL
-===================================== */
-
-modalConfirm.addEventListener(
-    "click",
-    async () => {
-
-        if (!selectedCandidate) {
+        if (!voteModal) {
             return;
         }
 
-        // Prevent multiple clicks
-        modalConfirm.disabled = true;
-
-        const originalText = modalConfirm.textContent;
-
-        modalConfirm.textContent = "SUBMITTING...";
-
-        try {
-
-            const response = await fetch(
-                "/api/vote",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        candidate_id:
-                            selectedCandidate.id
-                    })
-                }
-            );
-
-
-            const data =
-                await response.json();
-
-
-            /* ==============================
-               SUCCESS
-            ============================== */
-
-            if (response.ok && data.success) {
-
-                closeModal();
-
-                alert(
-                    `✓ Vote submitted successfully!\n\nYou voted for ${selectedCandidate.name} for ${selectedCandidate.position}.\n\nYour vote has been recorded.`
-                );
-
-
-                /*
-                 * Disable voting after successful vote.
-                 */
-
-                voteButton.disabled = true;
-
-                voteButton.textContent =
-                    "VOTE SUBMITTED";
-
-                voteButton.style.opacity =
-                    "0.5";
-
-                voteButton.style.pointerEvents =
-                    "none";
-
-
-                /*
-                 * Prevent further wheel voting.
-                 */
-
-                scrollLock = true;
-
-
-                /*
-                 * Update button state permanently
-                 * for this page session.
-                 */
-
-                voteButton.dataset.voted =
-                    "true";
-
-
-                return;
-            }
-
-
-            /* ==============================
-               ALREADY VOTED
-            ============================== */
-
-            if (response.status === 409) {
-
-                closeModal();
-
-                alert(
-                    "You have already voted.\n\nEach student can vote only once."
-                );
-
-                voteButton.disabled = true;
-
-                voteButton.textContent =
-                    "ALREADY VOTED";
-
-                voteButton.style.opacity =
-                    "0.5";
-
-                voteButton.style.pointerEvents =
-                    "none";
-
-                scrollLock = true;
-
-                return;
-            }
-
-
-            /* ==============================
-               OTHER SERVER ERROR
-            ============================== */
-
-            closeModal();
-
-            alert(
-                data.message ||
-                "Unable to submit your vote. Please try again."
-            );
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Vote submission error:",
-                error
-            );
-
-
-            alert(
-                "Unable to connect to the voting server.\n\nPlease make sure Flask is running and try again."
-            );
-
-        }
-
-        finally {
-
-            /*
-             * Re-enable button only if the vote
-             * wasn't successfully submitted.
-             */
-
-            if (
-                voteButton.dataset.voted !== "true"
-            ) {
-
-                modalConfirm.disabled =
-                    false;
-
-                modalConfirm.textContent =
-                    originalText;
-            }
-
-        }
+        voteModal.classList.remove(
+            "active"
+        );
 
     }
-);
-    /* =====================================
-       START
-    ===================================== */
 
-    await loadCandidates();
+
+    if (modalClose) {
+
+        modalClose.addEventListener(
+            "click",
+            closeModal
+        );
+
+    }
+
+
+    if (modalCancel) {
+
+        modalCancel.addEventListener(
+            "click",
+            closeModal
+        );
+
+    }
+
+
+    if (voteModal) {
+
+        voteModal.addEventListener(
+            "click",
+            (event) => {
+
+                if (
+                    event.target ===
+                    voteModal
+                ) {
+
+                    closeModal();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =========================================
+       VOTE BUTTON
+    ========================================== */
+
+    if (voteButton) {
+
+        voteButton.addEventListener(
+            "click",
+            () => {
+
+                if (!candidates.length) {
+                    return;
+                }
+
+                const candidate =
+                    candidates[activeIndex];
+
+                updateModal(
+                    candidate
+                );
+
+                if (voteModal) {
+
+                    voteModal.classList.add(
+                        "active"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =========================================
+       UPDATE VOTE BUTTON
+    ========================================== */
+
+    function updateVoteButton() {
+
+        /*
+            Keep the existing button state.
+            The backend remains responsible
+            for validating whether the student
+            can vote.
+        */
+
+        if (!voteButton) {
+            return;
+        }
+
+        if (
+            voteButton.classList.contains(
+                "vote-submitted"
+            )
+        ) {
+            return;
+        }
+
+        voteButton.innerHTML = `
+            <span>
+                VOTE FOR CANDIDATE
+            </span>
+
+            <span class="vote-arrow">
+                →
+            </span>
+        `;
+
+    }
+
+
+    /* =========================================
+       CONFIRM VOTE
+    ========================================== */
+
+    if (modalConfirm) {
+
+        modalConfirm.addEventListener(
+            "click",
+            async () => {
+
+                if (!candidates.length) {
+                    return;
+                }
+
+                const candidate =
+                    candidates[activeIndex];
+
+                modalConfirm.disabled =
+                    true;
+
+                modalConfirm.textContent =
+                    "SUBMITTING...";
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/api/vote",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+                                        candidate_id:
+                                            candidate.id
+                                    })
+                            }
+                        );
+
+                    const data =
+                        await response.json();
+
+                    if (
+                        !response.ok ||
+                        !data.success
+                    ) {
+
+                        throw new Error(
+                            data.message ||
+                            "Unable to submit vote."
+                        );
+
+                    }
+
+                    closeModal();
+
+                    voteButton.innerHTML = `
+                        <span>
+                            VOTE SUBMITTED
+                        </span>
+
+                        <span>
+                            ✓
+                        </span>
+                    `;
+
+                    voteButton.disabled =
+                        true;
+
+                    voteButton.classList.add(
+                        "vote-submitted"
+                    );
+
+                    alert(
+                        "Your vote has been submitted successfully."
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "Vote error:",
+                        error
+                    );
+
+                    alert(
+                        error.message ||
+                        "Something went wrong while submitting your vote."
+                    );
+
+                } finally {
+
+                    modalConfirm.disabled =
+                        false;
+
+                    modalConfirm.textContent =
+                        "CONFIRM VOTE";
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =========================================
+       HTML ESCAPE
+    ========================================== */
+
+    function escapeHTML(
+        value
+    ) {
+
+        const div =
+            document.createElement("div");
+
+        div.textContent =
+            value ?? "";
+
+        return div.innerHTML;
+
+    }
+
+
+    /* =========================================
+       RESIZE
+    ========================================== */
+
+    window.addEventListener(
+        "resize",
+        () => {
+
+            positionWheel();
+
+        }
+    );
+
+
+    /* =========================================
+       START APPLICATION
+    ========================================== */
+
+    loadCandidates();
 
 });

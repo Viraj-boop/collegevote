@@ -19,142 +19,136 @@
 
 </head>
 
+
 <body>
 
-    <!-- =========================================
-         NAVIGATION
-    ========================================== -->
 
-    <header class="navbar">
+<!-- =========================================
+     NAVIGATION
+========================================= -->
 
-        <div class="brand">
-            COLLEGE<span>VOTE</span>
+<header class="navbar">
+
+    <div class="brand">
+        COLLEGE<span>VOTE</span>
+    </div>
+
+    <div class="nav-center">
+        2026 COLLEGE ELECTION
+    </div>
+
+    <div class="candidate-counter">
+
+        <span id="currentNumber">
+            01
+        </span>
+
+        <span>
+            /
+        </span>
+
+        <span id="totalNumber">
+            05
+        </span>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================
+     HERO
+========================================= -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="hero-eyebrow">
+            STUDENT ELECTIONS • 2026
         </div>
 
-        <div class="nav-center">
-            2026 COLLEGE ELECTION
-        </div>
+        <h1>
+            YOUR VOTE.
+            <br>
+            YOUR VOICE.
+        </h1>
 
-        <div class="candidate-counter">
+        <p>
+            Meet the candidates.
+            <br>
+            Make your choice.
+            <br>
+            Shape your campus.
+        </p>
 
-            <span id="currentNumber">01</span>
+        <div class="hero-scroll">
 
-            <span class="counter-slash">/</span>
+            <span>
+                SCROLL TO EXPLORE
+            </span>
 
-            <span id="totalNumber">05</span>
-
-        </div>
-
-    </header>
-
-
-    <!-- =========================================
-         HERO
-    ========================================== -->
-
-    <section class="hero">
-
-        <div class="hero-content">
-
-            <div class="hero-eyebrow">
-                STUDENT ELECTIONS • 2026
-            </div>
-
-            <h1>
-                YOUR VOTE.
-                <br>
-                YOUR VOICE.
-            </h1>
-
-            <p>
-                Meet the candidates.
-                <br>
-                Make your choice.
-                <br>
-                Shape your campus.
-            </p>
-
-            <div class="hero-scroll">
-
-                <span>
-                    SCROLL TO EXPLORE
-                </span>
-
-                <span class="hero-arrow">
-                    ↓
-                </span>
-
-            </div>
+            <span class="hero-arrow">
+                ↓
+            </span>
 
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 
-    <!-- =========================================
-         VOTING EXPERIENCE
-    ========================================== -->
 
-    <main class="voting-experience">
+<!-- =========================================
+     WHEEL EXPERIENCE
+========================================= -->
 
-        <!-- LEFT SIDE : WHEEL -->
+<main
+    class="voting-experience"
+    id="candidateStage"
+>
 
-        <section class="wheel-area">
 
-            <div class="wheel-wrapper">
+    <!-- =====================================
+         LEFT / WHEEL
+    ====================================== -->
 
-                <div
-                    class="candidate-wheel"
-                    id="candidateWheel"
-                >
+    <section class="wheel-area">
 
-                    <!-- Candidates are generated
-                         by JavaScript -->
 
-                </div>
+        <div class="wheel-heading">
 
+            <span>
+                CANDIDATES
+            </span>
+
+            <div class="wheel-heading-line"></div>
+
+        </div>
+
+
+        <div class="wheel-wrapper">
+
+
+            <!-- Actual rotating wheel -->
+
+            <div
+                class="candidate-wheel"
+                id="candidateWheel"
+            >
             </div>
 
 
-            <!-- Scroll instruction -->
+            <!-- Center candidate image -->
 
-            <div class="wheel-instruction">
+            <div
+                class="wheel-center"
+                id="wheelCenter"
+            >
 
-                <span class="mouse-icon"></span>
-
-                <span>
-                    SCROLL TO ROTATE
-                </span>
-
-            </div>
-
-        </section>
-
-
-        <!-- RIGHT SIDE : ACTIVE CANDIDATE -->
-
-        <section class="candidate-panel">
-
-            <div class="candidate-panel-inner">
-
-                <div class="candidate-index">
-
-                    <span id="panelNumber">
-                        01
-                    </span>
-
-                    <span>
-                        / 
-                    </span>
-
-                    <span id="panelTotal">
-                        05
-                    </span>
-
-                </div>
-
-
-                <div class="candidate-photo-wrapper">
+                <div class="center-frame">
 
                     <div
                         class="candidate-photo"
@@ -169,148 +163,245 @@
 
                 </div>
 
+                <div class="center-label">
 
-                <div class="candidate-info">
-
-                    <div
-                        class="candidate-position"
-                        id="candidatePosition"
-                    >
-                        PRESIDENT
-                    </div>
-
-                    <h2 id="candidateName">
-                        Arjun Sharma
-                    </h2>
-
-                    <div
-                        class="candidate-department"
-                        id="candidateDepartment"
-                    >
-                        Computer Engineering
-                    </div>
-
-                    <p
-                        class="candidate-description"
-                        id="candidateDescription"
-                    >
-                        Building a stronger,
-                        smarter and more connected
-                        campus for every student.
-                    </p>
-
-
-                    <button
-                        class="vote-button"
-                        id="voteButton"
-                    >
-
-                        <span>
-                            VOTE FOR CANDIDATE
-                        </span>
-
-                        <span class="vote-arrow">
-                            →
-                        </span>
-
-                    </button>
+                    <span>
+                        SELECTED
+                    </span>
 
                 </div>
 
             </div>
 
-        </section>
 
-    </main>
+            <!-- Wheel index -->
 
+            <div class="wheel-index">
 
-    <!-- =========================================
-         VOTE CONFIRMATION MODAL
-    ========================================== -->
+                <span id="stageNumber">
+                    01
+                </span>
 
-    <div
-        class="modal"
-        id="voteModal"
-    >
+                <span class="wheel-index-line"></span>
 
-        <div class="modal-box">
+                <span id="stageTotal">
+                    05
+                </span>
 
-            <button
-                class="modal-close"
-                id="modalClose"
-            >
-                ×
-            </button>
-
-
-            <div class="modal-eyebrow">
-                CONFIRM YOUR VOTE
             </div>
 
 
-            <h3>
-                Are you sure?
-            </h3>
+        </div>
 
 
-            <div class="modal-candidate">
+        <div class="wheel-instruction">
+
+            <span class="mouse-icon"></span>
+
+            <span>
+                SCROLL TO ROTATE
+            </span>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================
+         RIGHT / CANDIDATE INFORMATION
+    ====================================== -->
+
+    <section class="candidate-panel">
+
+
+        <div class="candidate-panel-inner">
+
+
+            <div class="candidate-index">
+
+                <span id="panelNumber">
+                    01
+                </span>
+
+                <span>
+                    /
+                </span>
+
+                <span id="panelTotal">
+                    05
+                </span>
+
+            </div>
+
+
+            <div class="candidate-copy">
+
 
                 <div
-                    id="modalCandidatePosition"
-                    class="modal-position"
+                    class="candidate-position"
+                    id="candidatePosition"
                 >
                     PRESIDENT
                 </div>
 
-                <div
-                    id="modalCandidateName"
-                    class="modal-name"
-                >
+
+                <h2 id="candidateName">
                     Arjun Sharma
+                </h2>
+
+
+                <div
+                    class="candidate-department"
+                    id="candidateDepartment"
+                >
+                    Computer Engineering
                 </div>
 
+
+                <p
+                    class="candidate-description"
+                    id="candidateDescription"
+                >
+                    Building a stronger, smarter and more connected campus for every student.
+                </p>
+
+
+                <button
+                    class="vote-button"
+                    id="voteButton"
+                >
+
+                    <span>
+                        VOTE FOR CANDIDATE
+                    </span>
+
+                    <span class="vote-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
             </div>
 
 
-            <p class="modal-warning">
+            <div class="candidate-next">
 
-                You can vote only once.
-                <br>
-                Your vote cannot be changed after confirmation.
+                <span>
+                    SCROLL
+                </span>
 
-            </p>
-
-
-            <div class="modal-actions">
-
-                <button
-                    class="modal-cancel"
-                    id="modalCancel"
-                >
-                    CANCEL
-                </button>
-
-                <button
-                    class="modal-confirm"
-                    id="modalConfirm"
-                >
-                    CONFIRM VOTE
-                </button>
+                <span>
+                    ↓
+                </span>
 
             </div>
+
 
         </div>
 
+    </section>
+
+
+</main>
+
+
+
+<!-- =========================================
+     VOTE CONFIRMATION MODAL
+========================================= -->
+
+<div
+    class="modal"
+    id="voteModal"
+>
+
+    <div class="modal-box">
+
+
+        <button
+            class="modal-close"
+            id="modalClose"
+        >
+            ×
+        </button>
+
+
+        <div class="modal-eyebrow">
+            CONFIRM YOUR VOTE
+        </div>
+
+
+        <h3>
+            Are you sure?
+        </h3>
+
+
+        <div class="modal-candidate">
+
+
+            <div
+                id="modalCandidatePosition"
+                class="modal-position"
+            >
+                PRESIDENT
+            </div>
+
+
+            <div
+                id="modalCandidateName"
+                class="modal-name"
+            >
+                Arjun Sharma
+            </div>
+
+
+        </div>
+
+
+        <p class="modal-warning">
+
+            You can vote only once.
+            <br>
+            Your vote cannot be changed after confirmation.
+
+        </p>
+
+
+        <div class="modal-actions">
+
+
+            <button
+                class="modal-cancel"
+                id="modalCancel"
+            >
+                CANCEL
+            </button>
+
+
+            <button
+                class="modal-confirm"
+                id="modalConfirm"
+            >
+                CONFIRM VOTE
+            </button>
+
+
+        </div>
+
+
     </div>
 
+</div>
 
-    <!-- =========================================
-         JAVASCRIPT
-    ========================================== -->
 
-    <script
-        src="{{ url_for('static', filename='js/wheel.js') }}"
-    ></script>
+
+<script
+    src="{{ url_for('static', filename='js/wheel.js') }}"
+></script>
+
 
 </body>
 
