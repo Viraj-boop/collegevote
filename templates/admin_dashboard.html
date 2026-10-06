@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CollegeVote — Admin Dashboard</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f3f0ea;
+            --surface: #ffffff;
+            --black: #111111;
+            --muted: #77736c;
+            --line: rgba(17,17,17,.12);
+            --soft: #ebe7df;
+            --success: #1f7a4d;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--black);
+            font-family: "Inter", sans-serif;
+            min-height: 100vh;
+        }
+
+        button,
+        a {
+            font-family: inherit;
+        }
+
+        /* ================================
+           TOP NAV
+        ================================= */
+
+        .topbar {
+            height: 82px;
+            padding: 0 45px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            border-bottom: 1px solid var(--line);
+            background: rgba(243,240,234,.94);
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+
+            backdrop-filter: blur(15px);
+        }
+
+        .brand {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 21px;
+            font-weight: 700;
+            letter-spacing: -.06em;
+        }
+
+        .brand span {
+            font-weight: 400;
+        }
+
+        .topbar-center {
+            font-size: 9px;
+            letter-spacing: .28em;
+            font-weight: 600;
+        }
+
+        .admin-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .admin-user {
+            font-size: 9px;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .logout-btn {
+            text-decoration: none;
+            color: white;
+            background: var(--black);
+
+            padding: 12px 18px;
+
+            font-size: 8px;
+            letter-spacing: .16em;
+            font-weight: 700;
+
+            transition: .25s ease;
+        }
+
+        .logout-btn:hover {
+            background: transparent;
+            color: var(--black);
+            outline: 1px solid var(--black);
+        }
+
+        /* ================================
+           PAGE
+        ================================= */
+
+        .dashboard {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 65px 45px 100px;
+        }
+
+        .eyebrow {
+            font-size: 9px;
+            letter-spacing: .28em;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: clamp(52px, 7vw, 105px);
+            line-height: .84;
+            letter-spacing: -.075em;
+            max-width: 850px;
+        }
+
+        .page-subtitle {
+            margin-top: 25px;
+            max-width: 560px;
+
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+
+            margin-bottom: 65px;
+        }
+
+        .refresh-btn {
+            border: 1px solid var(--black);
+            background: transparent;
+
+            padding: 14px 20px;
+
+            cursor: pointer;
+
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: .18em;
+
+            transition: .25s ease;
+        }
+
+        .refresh-btn:hover {
+            background: var(--black);
+            color: white;
+        }
+
+        /* ================================
+           STAT CARDS
+        ================================= */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+
+            border-top: 1px solid var(--black);
+            border-bottom: 1px solid var(--line);
+
+            margin-bottom: 70px;
+        }
+
+        .stat-card {
+            min-height: 190px;
+            padding: 30px;
+
+            border-right: 1px solid var(--line);
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .stat-card:last-child {
+            border-right: 0;
+        }
+
+        .stat-label {
+            font-size: 8px;
+            letter-spacing: .22em;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .stat-value {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 58px;
+            letter-spacing: -.06em;
+            line-height: 1;
+        }
+
+        .stat-small {
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        /* ================================
+           MAIN GRID
+        ================================= */
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.4fr .6fr;
+            gap: 25px;
+
+            margin-bottom: 70px;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+        }
+
+        .panel-header {
+            min-height: 80px;
+
+            padding: 25px 30px;
+
+            border-bottom: 1px solid var(--line);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-title {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 22px;
+            letter-spacing: -.04em;
+        }
+
+        .panel-meta {
+            font-size: 8px;
+            letter-spacing: .18em;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        /* ================================
+           LEADER
+        ================================= */
+
+        .leader-panel {
+            padding: 30px;
+            min-height: 270px;
+
+            background: var(--black);
+            color: white;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .leader-eyebrow {
+            font-size: 8px;
+            letter-spacing: .25em;
+            opacity: .55;
+        }
+
+        .leader-name {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: clamp(40px, 4vw, 68px);
+            line-height: .9;
+            letter-spacing: -.065em;
+        }
+
+        .leader-position {
+            margin-top: 15px;
+
+            font-size: 9px;
+            letter-spacing: .18em;
+
+            opacity: .55;
+        }
+
+        .leader-votes {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+
+            border-top: 1px solid rgba(255,255,255,.2);
+            padding-top: 20px;
+        }
+
+        .leader-vote-number {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 35px;
+        }
+
+        .leader-vote-label {
+            font-size: 8px;
+            letter-spacing: .18em;
+            opacity: .5;
+        }
+
+        .no-leader {
+            color: rgba(255,255,255,.5);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* ================================
+           CANDIDATES
+        ================================= */
+
+        .candidate-list {
+            padding: 0;
+        }
+
+        .candidate-row {
+            padding: 25px 30px;
+
+            display: grid;
+            grid-template-columns: 45px 1fr 150px 70px;
+
+            align-items: center;
+            gap: 20px;
+
+            border-bottom: 1px solid var(--line);
+        }
+
+        .candidate-row:last-child {
+            border-bottom: 0;
+        }
+
+        .candidate-rank {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .candidate-name {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 20px;
+            letter-spacing: -.035em;
+        }
+
+        .candidate-position {
+            margin-top: 6px;
+
+            font-size: 7px;
+            letter-spacing: .18em;
+
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .candidate-bar-area {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .bar-track {
+            height: 5px;
+            width: 100%;
+
+            background: var(--soft);
+
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--black);
+
+            transition: width 1s cubic-bezier(.22,1,.36,1);
+        }
+
+        .candidate-percentage {
+            font-size: 8px;
+            color: var(--muted);
+        }
+
+        .candidate-votes {
+            text-align: right;
+
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 25px;
+        }
+
+        /* ================================
+           RECENT VOTES
+        ================================= */
+
+        .recent-panel {
+            background: white;
+            border: 1px solid var(--line);
+        }
+
+        .recent-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .recent-table th {
+            padding: 17px 30px;
+
+            text-align: left;
+
+            font-size: 7px;
+            letter-spacing: .2em;
+
+            color: var(--muted);
+
+            border-bottom: 1px solid var(--line);
+        }
+
+        .recent-table td {
+            padding: 19px 30px;
+
+            font-size: 11px;
+
+            border-bottom: 1px solid var(--line);
+        }
+
+        .recent-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .student-id {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 600;
+        }
+
+        .vote-candidate {
+            font-weight: 600;
+        }
+
+        .vote-position {
+            margin-top: 4px;
+
+            font-size: 7px;
+            letter-spacing: .12em;
+
+            color: var(--muted);
+        }
+
+        .vote-time {
+            color: var(--muted);
+        }
+
+        .empty-state {
+            padding: 50px 30px;
+            text-align: center;
+
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* ================================
+           FOOTER
+        ================================= */
+
+        .dashboard-footer {
+            padding-top: 30px;
+
+            border-top: 1px solid var(--line);
+
+            display: flex;
+            justify-content: space-between;
+
+            color: var(--muted);
+
+            font-size: 8px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        /* ================================
+           ERROR
+        ================================= */
+
+        .error-box {
+            padding: 25px;
+            margin-bottom: 40px;
+
+            background: #171717;
+            color: white;
+
+            font-size: 12px;
+        }
+
+        /* ================================
+           RESPONSIVE
+        ================================= */
+
+        @media (max-width: 1100px) {
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-card:nth-child(2) {
+                border-right: 0;
+            }
+
+            .stat-card:nth-child(-n+2) {
+                border-bottom: 1px solid var(--line);
+            }
+        }
+
+        @media (max-width: 750px) {
+
+            .topbar {
+                padding: 0 20px;
+            }
+
+            .topbar-center,
+            .admin-user {
+                display: none;
+            }
+
+            .dashboard {
+                padding: 45px 20px 70px;
+            }
+
+            .header-row {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .stat-card:last-child {
+                border-bottom: 0;
+            }
+
+            .candidate-row {
+                grid-template-columns: 35px 1fr 60px;
+                gap: 12px;
+            }
+
+            .candidate-bar-area {
+                display: none;
+            }
+
+            .candidate-name {
+                font-size: 17px;
+            }
+
+            .candidate-votes {
+                font-size: 21px;
+            }
+
+            .recent-table th,
+            .recent-table td {
+                padding: 15px;
+            }
+
+            .recent-table th:nth-child(3),
+            .recent-table td:nth-child(3) {
+                display: none;
+            }
+
+            .dashboard-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =========================================
+     TOP NAVIGATION
+========================================= -->
+
+<header class="topbar">
+
+    <div class="brand">
+        COLLEGE<span>VOTE</span>
+    </div>
+
+    <div class="topbar-center">
+        2026 ELECTION • ADMIN
+    </div>
+
+    <div class="admin-actions">
+
+        <div class="admin-user">
+            {{ session.get("admin_username", "ADMIN") }}
+        </div>
+
+        <a
+            href="{{ url_for('admin_logout') }}"
+            class="logout-btn"
+        >
+            LOG OUT
+        </a>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================
+     DASHBOARD
+========================================= -->
+
+<main class="dashboard">
+
+    {% if error %}
+
+        <div class="error-box">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    <!-- HEADER -->
+
+    <section class="header-row">
+
+        <div>
+
+            <div class="eyebrow">
+                ELECTION CONTROL CENTER • 2026
+            </div>
+
+            <h1 class="page-title">
+                Election<br>
+                Overview.
+            </h1>
+
+            <p class="page-subtitle">
+                Monitor participation, candidate performance,
+                and voting activity from one central dashboard.
+            </p>
+
+        </div>
+
+
+        <button
+            class="refresh-btn"
+            onclick="window.location.reload()"
+        >
+            ↻ &nbsp; REFRESH RESULTS
+        </button>
+
+    </section>
+
+
+    <!-- =========================================
+         STATISTICS
+    ========================================== -->
+
+    <section class="stats-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                TOTAL STUDENTS
+            </div>
+
+            <div class="stat-value">
+                {{ total_students }}
+            </div>
+
+            <div class="stat-small">
+                Registered voters
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                STUDENTS VOTED
+            </div>
+
+            <div class="stat-value">
+                {{ voted_students }}
+            </div>
+
+            <div class="stat-small">
+                Completed ballots
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                TOTAL VOTES
+            </div>
+
+            <div class="stat-value">
+                {{ total_votes }}
+            </div>
+
+            <div class="stat-small">
+                Recorded votes
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                TURNOUT
+            </div>
+
+            <div class="stat-value">
+                {{ turnout }}%
+            </div>
+
+            <div class="stat-small">
+                Participation rate
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         LEADER + CANDIDATE RESULTS
+    ========================================== -->
+
+    <section class="content-grid">
+
+
+        <!-- LEADER -->
+
+        <div class="leader-panel">
+
+            <div class="leader-eyebrow">
+                CURRENT LEADER
+            </div>
+
+
+            {% if leader %}
+
+                <div>
+
+                    <div class="leader-name">
+                        {{ leader.name }}
+                    </div>
+
+                    <div class="leader-position">
+                        {{ leader.position }}
+                        {% if leader.department %}
+                            • {{ leader.department }}
+                        {% endif %}
+                    </div>
+
+                </div>
+
+
+                <div class="leader-votes">
+
+                    <div>
+
+                        <div class="leader-vote-number">
+                            {{ leader.votes }}
+                        </div>
+
+                        <div class="leader-vote-label">
+                            VOTES
+                        </div>
+
+                    </div>
+
+
+                    <div>
+
+                        <div class="leader-vote-number">
+                            {{ leader.percentage }}%
+                        </div>
+
+                        <div class="leader-vote-label">
+                            OF ALL VOTES
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div class="no-leader">
+                    No votes have been recorded yet.
+                    <br><br>
+                    The leader will appear here once voting begins.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- CANDIDATE RESULTS -->
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <div class="panel-title">
+                    Candidate Results
+                </div>
+
+                <div class="panel-meta">
+                    {{ candidates|length }} candidates
+                </div>
+
+            </div>
+
+
+            <div class="candidate-list">
+
+                {% for candidate in candidates %}
+
+                    <div class="candidate-row">
+
+                        <div class="candidate-rank">
+                            {{ "%02d"|format(loop.index) }}
+                        </div>
+
+
+                        <div>
+
+                            <div class="candidate-name">
+                                {{ candidate.name }}
+                            </div>
+
+                            <div class="candidate-position">
+                                {{ candidate.position }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="candidate-bar-area">
+
+                            <div class="bar-track">
+
+                                <div
+                                    class="bar-fill"
+                                    style="width: {{ candidate.percentage }}%;"
+                                ></div>
+
+                            </div>
+
+                            <div class="candidate-percentage">
+                                {{ candidate.percentage }}%
+                            </div>
+
+                        </div>
+
+
+                        <div class="candidate-votes">
+                            {{ candidate.votes or 0 }}
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+                        No candidates found.
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         RECENT ACTIVITY
+    ========================================== -->
+
+    <section class="recent-panel">
+
+        <div class="panel-header">
+
+            <div class="panel-title">
+                Recent Voting Activity
+            </div>
+
+            <div class="panel-meta">
+                Latest 20 votes
+            </div>
+
+        </div>
+
+
+        {% if recent_votes %}
+
+            <table class="recent-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            STUDENT
+                        </th>
+
+                        <th>
+                            CANDIDATE
+                        </th>
+
+                        <th>
+                            POSITION
+                        </th>
+
+                        <th>
+                            TIME
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for vote in recent_votes %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="student-id">
+                                    {{ vote.masked_student_id }}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="vote-candidate">
+                                    {{ vote.candidate_name }}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="vote-position">
+                                    {{ vote.candidate_position }}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="vote-time">
+
+                                    {% if vote.created_at %}
+                                        {{ vote.created_at }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        {% else %}
+
+            <div class="empty-state">
+                No votes have been recorded yet.
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <footer class="dashboard-footer">
+
+        <span>
+            COLLEGEVOTE • 2026
+        </span>
+
+        <span>
+            ADMINISTRATOR CONTROL PANEL
+        </span>
+
+    </footer>
+
+</main>
+
+
+<script>
+
+    /*
+     * Animate candidate result bars
+     * after the dashboard loads.
+     */
+
+    window.addEventListener("load", function () {
+
+        const bars = document.querySelectorAll(".bar-fill");
+
+        bars.forEach(function (bar) {
+
+            const targetWidth = bar.style.width;
+
+            bar.style.width = "0%";
+
+            setTimeout(function () {
+
+                bar.style.width = targetWidth;
+
+            }, 150);
+
+        });
+
+    });
+
+
+    /*
+     * Keyboard shortcut:
+     * Press R to refresh dashboard.
+     */
+
+    document.addEventListener("keydown", function (event) {
+
+        if (
+            event.key.toLowerCase() === "r" &&
+            !event.ctrlKey &&
+            !event.metaKey &&
+            !event.altKey
+        ) {
+
+            window.location.reload();
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

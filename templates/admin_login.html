@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CollegeVote — Admin Login</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/admin.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <main class="admin-login">
+
+        <div class="admin-login-box">
+
+            <div class="admin-brand">
+                COLLEGE<span>VOTE</span>
+            </div>
+
+            <div class="admin-eyebrow">
+                2026 ELECTION • ADMIN
+            </div>
+
+            <h1>
+                Admin
+                <br>
+                Dashboard
+            </h1>
+
+            <p class="admin-subtitle">
+                Sign in to manage and monitor the election.
+            </p>
+
+            {% if error %}
+
+                <div class="admin-error">
+                    {{ error }}
+                </div>
+
+            {% endif %}
+
+            <form
+                method="POST"
+                action="{{ url_for('admin_login') }}"
+            >
+
+                <label>
+                    ADMIN USERNAME
+                </label>
+
+                <input
+                    type="text"
+                    name="username"
+                    autocomplete="username"
+                    required
+                >
+
+                <label>
+                    PASSWORD
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="admin-login-button"
+                >
+                    SIGN IN
+                    <span>→</span>
+                </button>
+
+            </form>
+
+            <a
+                href="{{ url_for('home') }}"
+                class="back-link"
+            >
+                ← BACK TO COLLEGEVOTE
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

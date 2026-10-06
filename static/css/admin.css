@@ -1,0 +1,581 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #f4f1eb;
+    color: #111;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================
+   SHARED
+========================================= */
+
+.admin-brand {
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: -.04em;
+}
+
+.admin-brand span {
+    opacity: .45;
+}
+
+.admin-eyebrow {
+    font-size: 9px;
+    letter-spacing: .25em;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
+
+.stat-label {
+    display: block;
+    font-size: 8px;
+    letter-spacing: .2em;
+    font-weight: 700;
+    opacity: .55;
+}
+
+
+/* =========================================
+   ADMIN LOGIN
+========================================= */
+
+.admin-login {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.admin-login-box {
+    width: min(460px, 100%);
+    padding: 55px;
+    border: 1px solid rgba(0, 0, 0, .12);
+    background: #f8f5ef;
+}
+
+.admin-login-box .admin-brand {
+    margin-bottom: 80px;
+}
+
+.admin-login-box h1 {
+    font-size: clamp(55px, 9vw, 90px);
+    line-height: .82;
+    letter-spacing: -.07em;
+    margin: 0 0 25px;
+}
+
+.admin-subtitle {
+    color: #777;
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 35px;
+}
+
+.admin-login-box form {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-login-box label {
+    font-size: 8px;
+    letter-spacing: .2em;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.admin-login-box input {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 22px;
+    border: 1px solid rgba(0, 0, 0, .18);
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+}
+
+.admin-login-box input:focus {
+    border-color: #111;
+}
+
+.admin-login-button {
+    margin-top: 10px;
+    padding: 18px 20px;
+    border: 1px solid #111;
+    background: #111;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    letter-spacing: .2em;
+    font-weight: 700;
+}
+
+.admin-login-button:hover {
+    background: transparent;
+    color: #111;
+}
+
+.admin-error,
+.dashboard-error {
+    padding: 14px 16px;
+    margin-bottom: 25px;
+    border: 1px solid #b3261e;
+    color: #b3261e;
+    background: rgba(179, 38, 30, .04);
+    font-size: 11px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 30px;
+    color: #111;
+    text-decoration: none;
+    font-size: 8px;
+    letter-spacing: .2em;
+    font-weight: 700;
+}
+
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+.admin-navbar {
+    height: 76px;
+    border-bottom: 1px solid rgba(0, 0, 0, .12);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    padding: 0 45px;
+}
+
+.admin-nav-title {
+    text-align: center;
+    font-size: 8px;
+    letter-spacing: .22em;
+    font-weight: 700;
+}
+
+.admin-nav-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 25px;
+}
+
+.admin-nav-actions a {
+    color: #111;
+    text-decoration: none;
+    font-size: 8px;
+    letter-spacing: .18em;
+    font-weight: 700;
+}
+
+.logout-link {
+    opacity: .5;
+}
+
+
+/* =========================================
+   DASHBOARD
+========================================= */
+
+.dashboard {
+    max-width: 1400px;
+    margin: auto;
+    padding: 90px 55px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 70px;
+}
+
+.dashboard-header h1 {
+    font-size: clamp(65px, 8vw, 120px);
+    line-height: .8;
+    letter-spacing: -.08em;
+    margin: 0;
+}
+
+.election-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 8px;
+    letter-spacing: .18em;
+    font-weight: 700;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #111;
+}
+
+
+/* =========================================
+   STATS
+========================================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid rgba(0, 0, 0, .15);
+    border-bottom: 1px solid rgba(0, 0, 0, .15);
+    margin-bottom: 35px;
+}
+
+.stat-card {
+    padding: 30px;
+    border-right: 1px solid rgba(0, 0, 0, .12);
+}
+
+.stat-card:last-child {
+    border-right: 0;
+}
+
+.stat-card strong {
+    display: block;
+    margin-top: 18px;
+    font-size: 55px;
+    line-height: 1;
+    letter-spacing: -.07em;
+}
+
+
+/* =========================================
+   LEADER
+========================================= */
+
+.leader-card {
+    padding: 35px;
+    background: #111;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 90px;
+}
+
+.leader-card .stat-label {
+    color: white;
+}
+
+.leader-card h2 {
+    margin: 14px 0 8px;
+    font-size: 45px;
+    letter-spacing: -.05em;
+}
+
+.leader-card p {
+    margin: 0;
+    opacity: .5;
+    font-size: 10px;
+    letter-spacing: .12em;
+}
+
+.leader-votes {
+    text-align: right;
+}
+
+.leader-votes strong {
+    display: block;
+    font-size: 70px;
+    line-height: .8;
+    letter-spacing: -.08em;
+}
+
+.leader-votes span {
+    font-size: 8px;
+    letter-spacing: .2em;
+    opacity: .5;
+}
+
+
+/* =========================================
+   SECTIONS
+========================================= */
+
+.dashboard-section {
+    margin-bottom: 90px;
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid rgba(0, 0, 0, .15);
+    padding-bottom: 20px;
+    margin-bottom: 15px;
+}
+
+.section-heading > div {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.section-number {
+    font-size: 9px;
+    letter-spacing: .15em;
+    opacity: .45;
+}
+
+.section-heading h2 {
+    margin: 0;
+    font-size: 32px;
+    letter-spacing: -.05em;
+}
+
+.section-heading > span {
+    font-size: 8px;
+    letter-spacing: .18em;
+    opacity: .5;
+}
+
+
+/* =========================================
+   RESULTS
+========================================= */
+
+.result-row {
+    min-height: 90px;
+    display: grid;
+    grid-template-columns: 60px 260px 1fr 100px;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
+
+.result-rank {
+    font-size: 10px;
+    opacity: .4;
+}
+
+.result-candidate strong {
+    display: block;
+    font-size: 17px;
+}
+
+.result-candidate span {
+    display: block;
+    margin-top: 6px;
+    font-size: 8px;
+    letter-spacing: .15em;
+    opacity: .5;
+}
+
+.result-bar {
+    height: 5px;
+    background: rgba(0, 0, 0, .08);
+    overflow: hidden;
+}
+
+.result-bar-fill {
+    height: 100%;
+    background: #111;
+    transition: width .5s ease;
+}
+
+.result-number {
+    text-align: right;
+}
+
+.result-number strong {
+    display: block;
+    font-size: 25px;
+}
+
+.result-number span {
+    font-size: 8px;
+    letter-spacing: .1em;
+    opacity: .5;
+}
+
+
+/* =========================================
+   RECENT VOTES
+========================================= */
+
+.votes-table {
+    border-top: 1px solid rgba(0, 0, 0, .12);
+}
+
+.table-header,
+.table-row {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1.4fr 1.5fr;
+    gap: 20px;
+    align-items: center;
+}
+
+.table-header {
+    min-height: 45px;
+    font-size: 7px;
+    letter-spacing: .2em;
+    font-weight: 700;
+    opacity: .45;
+}
+
+.table-row {
+    min-height: 60px;
+    border-top: 1px solid rgba(0, 0, 0, .08);
+    font-size: 11px;
+}
+
+.table-row span {
+    color: #666;
+}
+
+.table-row .masked-id {
+    font-family: monospace;
+    color: #111;
+}
+
+.empty-state {
+    padding: 40px 0;
+    color: #777;
+    font-size: 12px;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.admin-footer {
+    padding-top: 30px;
+    border-top: 1px solid rgba(0, 0, 0, .12);
+    font-size: 8px;
+    letter-spacing: .18em;
+    opacity: .5;
+}
+
+.admin-footer span {
+    float: right;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .admin-navbar {
+        grid-template-columns: 1fr auto;
+        padding: 0 25px;
+    }
+
+    .admin-nav-title {
+        display: none;
+    }
+
+    .dashboard {
+        padding: 60px 25px;
+    }
+
+    .dashboard-header {
+        display: block;
+    }
+
+    .election-status {
+        margin-top: 30px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-card:nth-child(2) {
+        border-right: 0;
+    }
+
+    .result-row {
+        grid-template-columns: 35px 1fr 80px;
+    }
+
+    .result-bar {
+        display: none;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .admin-login-box {
+        padding: 35px 25px;
+    }
+
+    .admin-login-box .admin-brand {
+        margin-bottom: 55px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 60px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .stat-card {
+        padding: 20px 15px;
+    }
+
+    .stat-card strong {
+        font-size: 38px;
+    }
+
+    .leader-card {
+        padding: 25px;
+    }
+
+    .leader-card h2 {
+        font-size: 30px;
+    }
+
+    .leader-votes strong {
+        font-size: 45px;
+    }
+
+    .result-row {
+        grid-template-columns: 30px 1fr 70px;
+    }
+
+    .result-candidate strong {
+        font-size: 14px;
+    }
+
+    .table-header {
+        display: none;
+    }
+
+    .table-row {
+        grid-template-columns: 1fr 1fr;
+        padding: 15px 0;
+    }
+
+    .admin-footer span {
+        float: none;
+        display: block;
+        margin-top: 10px;
+    }
+
+}

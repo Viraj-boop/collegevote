@@ -8,6 +8,8 @@ from flask import (
 )
 
 import os
+import secrets
+
 from dotenv import load_dotenv
 import mysql.connector
 from mysql.connector import Error
@@ -26,11 +28,9 @@ load_dotenv()
 
 app = Flask(__name__)
 
-
-# Used to securely maintain the student's login session.
 app.secret_key = os.getenv(
     "SECRET_KEY",
-    "collegevote-secret-key-2026"
+    "collegevote-dev-secret-change-this"
 )
 
 
@@ -52,20 +52,18 @@ def get_db_connection():
 
             database=os.getenv("DB_NAME"),
 
-            port=int(os.getenv("DB_PORT", 3306)),
+            port=int(
+                os.getenv("DB_PORT", 3306)
+            ),
 
-            # Aiven requires encrypted database connections.
             ssl_disabled=False,
 
-            # For this college project, encryption is enabled
-            # without requiring a locally stored CA certificate.
             ssl_verify_cert=False,
 
             ssl_verify_identity=False
         )
 
         return connection
-
 
     except Error as e:
 
@@ -90,15 +88,14 @@ def home():
 
 
 # =========================================
-# LOGIN PAGE
+# STUDENT LOGIN
 # =========================================
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route(
+    "/login",
+    methods=["GET", "POST"]
+)
 def login():
-
-    # -----------------------------
-    # SHOW LOGIN PAGE
-    # -----------------------------
 
     if request.method == "GET":
 
@@ -107,24 +104,17 @@ def login():
         )
 
 
-    # -----------------------------
-    # GET FORM DATA
-    # -----------------------------
-
     student_id = request.form.get(
         "student_id",
         ""
     ).strip()
+
 
     password = request.form.get(
         "password",
         ""
     )
 
-
-    # -----------------------------
-    # BASIC VALIDATION
-    # -----------------------------
 
     if not student_id or not password:
 
@@ -152,10 +142,6 @@ def login():
         )
 
 
-        # -----------------------------
-        # FIND STUDENT
-        # -----------------------------
-
         cursor.execute(
             """
             SELECT
@@ -174,10 +160,6 @@ def login():
         student = cursor.fetchone()
 
 
-        # -----------------------------
-        # STUDENT NOT FOUND
-        # -----------------------------
-
         if student is None:
 
             cursor.close()
@@ -188,10 +170,6 @@ def login():
                 error="Invalid Student ID or password."
             )
 
-
-        # -----------------------------
-        # CHECK PASSWORD
-        # -----------------------------
 
         if password != student["password"]:
 
@@ -204,10 +182,6 @@ def login():
             )
 
 
-        # -----------------------------
-        # CHECK WHETHER ALREADY VOTED
-        # -----------------------------
-
         if student["has_voted"]:
 
             cursor.close()
@@ -219,9 +193,9 @@ def login():
             )
 
 
-        # -----------------------------
-        # CREATE LOGIN SESSION
-        # -----------------------------
+        # ---------------------------------
+        # CREATE STUDENT SESSION
+        # ---------------------------------
 
         session["student_id"] = student["student_id"]
 
@@ -235,10 +209,6 @@ def login():
         connection.close()
 
 
-        # -----------------------------
-        # LOGIN SUCCESS
-        # -----------------------------
-
         return redirect("/vote")
 
 
@@ -248,6 +218,7 @@ def login():
             "Login database error:",
             e
         )
+
 
         return render_template(
             "login.html",
@@ -262,8 +233,6 @@ def login():
 @app.route("/vote")
 def vote_page():
 
-    # Student must be logged in.
-
     if "student_id" not in session:
 
         return redirect("/login")
@@ -275,7 +244,7 @@ def vote_page():
 
 
 # =========================================
-# GET CANDIDATES FROM MYSQL
+# GET CANDIDATES
 # =========================================
 
 @app.route("/api/candidates")
@@ -351,12 +320,11 @@ def get_candidates():
 # CAST VOTE
 # =========================================
 
-@app.route("/api/vote", methods=["POST"])
+@app.route(
+    "/api/vote",
+    methods=["POST"]
+)
 def cast_vote():
-
-    # -------------------------------------
-    # CHECK LOGIN
-    # -------------------------------------
 
     if "student_id" not in session:
 
@@ -368,10 +336,6 @@ def cast_vote():
 
         }), 401
 
-
-    # -------------------------------------
-    # GET DATA FROM REQUEST
-    # -------------------------------------
 
     data = request.get_json()
 
@@ -393,8 +357,10 @@ def cast_vote():
             data["candidate_id"]
         )
 
-
-    except (ValueError, TypeError):
+    except (
+        ValueError,
+        TypeError
+    ):
 
         return jsonify({
 
@@ -407,10 +373,6 @@ def cast_vote():
 
     student_id = session["student_id"]
 
-
-    # -------------------------------------
-    # CONNECT TO DATABASE
-    # -------------------------------------
 
     connection = get_db_connection()
 
@@ -437,7 +399,7 @@ def cast_vote():
 
 
         # ---------------------------------
-        # CHECK STUDENT
+        # LOCK STUDENT
         # ---------------------------------
 
         cursor.execute(
@@ -472,7 +434,7 @@ def cast_vote():
 
 
         # ---------------------------------
-        # CHECK IF ALREADY VOTED
+        # ALREADY VOTED
         # ---------------------------------
 
         if student["has_voted"]:
@@ -489,7 +451,7 @@ def cast_vote():
 
 
         # ---------------------------------
-        # CHECK CANDIDATE
+        # LOCK CANDIDATE
         # ---------------------------------
 
         cursor.execute(
@@ -547,7 +509,7 @@ def cast_vote():
 
 
         # ---------------------------------
-        # INCREASE CANDIDATE VOTE COUNT
+        # INCREASE VOTE COUNT
         # ---------------------------------
 
         cursor.execute(
@@ -573,10 +535,6 @@ def cast_vote():
             (student_id,)
         )
 
-
-        # ---------------------------------
-        # SAVE EVERYTHING
-        # ---------------------------------
 
         connection.commit()
 
@@ -611,16 +569,13 @@ def cast_vote():
         )
 
 
-        # Duplicate student vote protection
-
         if getattr(e, "errno", None) == 1062:
 
             return jsonify({
 
                 "success": False,
 
-                "message":
-                    "You have already voted."
+                "message": "You have already voted."
 
             }), 409
 
@@ -629,8 +584,7 @@ def cast_vote():
 
             "success": False,
 
-            "message":
-                "Unable to record your vote."
+            "message": "Unable to record your vote."
 
         }), 500
 
@@ -650,8 +604,7 @@ def cast_vote():
 
             "success": False,
 
-            "message":
-                "Something went wrong."
+            "message": "Something went wrong."
 
         }), 500
 
@@ -663,6 +616,373 @@ def cast_vote():
             cursor.close()
 
         connection.close()
+
+
+# =========================================
+# ADMIN LOGIN
+# =========================================
+
+@app.route(
+    "/admin/login",
+    methods=["GET", "POST"]
+)
+def admin_login():
+
+    if session.get("admin_logged_in"):
+
+        return redirect("/admin/dashboard")
+
+
+    if request.method == "GET":
+
+        return render_template(
+            "admin_login.html"
+        )
+
+
+    username = request.form.get(
+        "username",
+        ""
+    ).strip()
+
+
+    password = request.form.get(
+        "password",
+        ""
+    )
+
+
+    admin_username = os.getenv(
+        "ADMIN_USERNAME"
+    )
+
+    admin_password = os.getenv(
+        "ADMIN_PASSWORD"
+    )
+
+
+    if not admin_username or not admin_password:
+
+        return render_template(
+            "admin_login.html",
+            error="Admin credentials are not configured."
+        )
+
+
+    username_valid = secrets.compare_digest(
+        username,
+        admin_username
+    )
+
+
+    password_valid = secrets.compare_digest(
+        password,
+        admin_password
+    )
+
+
+    if not username_valid or not password_valid:
+
+        return render_template(
+            "admin_login.html",
+            error="Invalid admin credentials."
+        )
+
+
+    session["admin_logged_in"] = True
+
+    session["admin_username"] = admin_username
+
+
+    return redirect(
+        "/admin/dashboard"
+    )
+
+
+# =========================================
+# ADMIN DASHBOARD
+# =========================================
+
+@app.route("/admin/dashboard")
+def admin_dashboard():
+
+    if not session.get("admin_logged_in"):
+
+        return redirect(
+            "/admin/login"
+        )
+
+
+    connection = get_db_connection()
+
+
+    if connection is None:
+
+        return render_template(
+            "admin_dashboard.html",
+            error="Database connection failed."
+        )
+
+
+    try:
+
+        cursor = connection.cursor(
+            dictionary=True
+        )
+
+
+        # =================================
+        # TOTAL STUDENTS
+        # =================================
+
+        cursor.execute(
+            """
+            SELECT COUNT(*) AS total_students
+            FROM students
+            """
+        )
+
+
+        total_students = cursor.fetchone()[
+            "total_students"
+        ]
+
+
+        # =================================
+        # STUDENTS WHO VOTED
+        # =================================
+
+        cursor.execute(
+            """
+            SELECT COUNT(*) AS voted_students
+            FROM students
+            WHERE has_voted = TRUE
+            """
+        )
+
+
+        voted_students = cursor.fetchone()[
+            "voted_students"
+        ]
+
+
+        # =================================
+        # TOTAL VOTES
+        # =================================
+
+        cursor.execute(
+            """
+            SELECT COUNT(*) AS total_votes
+            FROM votes
+            """
+        )
+
+
+        total_votes = cursor.fetchone()[
+            "total_votes"
+        ]
+
+
+        # =================================
+        # TURNOUT
+        # =================================
+
+        if total_students > 0:
+
+            turnout = round(
+                (
+                    voted_students /
+                    total_students
+                ) * 100,
+                1
+            )
+
+        else:
+
+            turnout = 0
+
+
+        # =================================
+        # CANDIDATE RESULTS
+        # =================================
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                name,
+                department,
+                position,
+                votes
+            FROM candidates
+            ORDER BY votes DESC, id ASC
+            """
+        )
+
+
+        candidates = cursor.fetchall()
+
+
+        # =================================
+        # TOTAL VOTES FOR PERCENTAGE
+        # =================================
+
+        vote_total = sum(
+            candidate["votes"] or 0
+            for candidate in candidates
+        )
+
+
+        for candidate in candidates:
+
+            candidate_votes = (
+                candidate["votes"] or 0
+            )
+
+
+            if vote_total > 0:
+
+                candidate["percentage"] = round(
+                    (
+                        candidate_votes /
+                        vote_total
+                    ) * 100,
+                    1
+                )
+
+            else:
+
+                candidate["percentage"] = 0
+
+
+        # =================================
+        # CURRENT LEADER
+        # =================================
+
+        leader = (
+            candidates[0]
+            if candidates and vote_total > 0
+            else None
+        )
+
+
+        # =================================
+        # RECENT VOTES
+        # =================================
+
+        cursor.execute(
+            """
+            SELECT
+                v.id,
+                v.student_id,
+                c.name AS candidate_name,
+                c.position AS candidate_position,
+                v.created_at
+            FROM votes v
+            INNER JOIN candidates c
+                ON v.candidate_id = c.id
+            ORDER BY v.created_at DESC
+            LIMIT 20
+            """
+        )
+
+
+        recent_votes = cursor.fetchall()
+
+
+        # =================================
+        # MASK STUDENT IDS
+        # =================================
+
+        for vote in recent_votes:
+
+            student_id = str(
+                vote["student_id"]
+            )
+
+
+            if len(student_id) > 3:
+
+                vote["masked_student_id"] = (
+                    student_id[:3]
+                    + "***"
+                )
+
+            else:
+
+                vote["masked_student_id"] = (
+                    "***"
+                )
+
+
+        cursor.close()
+
+        connection.close()
+
+
+        return render_template(
+
+            "admin_dashboard.html",
+
+            total_students=total_students,
+
+            voted_students=voted_students,
+
+            total_votes=total_votes,
+
+            turnout=turnout,
+
+            candidates=candidates,
+
+            leader=leader,
+
+            recent_votes=recent_votes,
+
+            vote_total=vote_total
+
+        )
+
+
+    except Error as e:
+
+        print(
+            "Admin dashboard database error:",
+            e
+        )
+
+
+        cursor.close()
+
+        connection.close()
+
+
+        return render_template(
+            "admin_dashboard.html",
+            error="Unable to load election data."
+        )
+
+
+# =========================================
+# ADMIN LOGOUT
+# =========================================
+
+@app.route("/admin/logout")
+def admin_logout():
+
+    session.pop(
+        "admin_logged_in",
+        None
+    )
+
+    session.pop(
+        "admin_username",
+        None
+    )
+
+
+    return redirect(
+        "/admin/login"
+    )
 
 
 # =========================================
@@ -706,7 +1026,6 @@ def database_test():
 
 
         return f"""
-
         <h1>
             ✅ Database Connected Successfully!
         </h1>
@@ -721,14 +1040,12 @@ def database_test():
                 {candidate_count}
             </strong>
         </p>
-
         """
 
 
     except Error as e:
 
         return f"""
-
         <h1>
             ❌ Database Query Failed
         </h1>
@@ -736,12 +1053,11 @@ def database_test():
         <p>
             {e}
         </p>
-
         """
 
 
 # =========================================
-# LOGOUT
+# STUDENT LOGOUT
 # =========================================
 
 @app.route("/logout")
@@ -749,7 +1065,9 @@ def logout():
 
     session.clear()
 
-    return redirect("/login")
+    return redirect(
+        "/login"
+    )
 
 
 # =========================================
